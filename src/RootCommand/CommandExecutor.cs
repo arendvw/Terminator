@@ -8,6 +8,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Terminator.RootCommand;
 
+/// <summary>
+/// This is the base command that executes all defined commands
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="appRunner"></param>
+/// <param name="serviceProvider"></param>
 public class CommandExecutor<T>(AppRunner<T> appRunner, IServiceProvider serviceProvider) where T : class
 {
     // Get all command instances from DI

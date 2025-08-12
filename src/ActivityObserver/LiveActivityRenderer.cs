@@ -8,6 +8,9 @@ using Timer = System.Timers.Timer;
 
 namespace Terminator.ActivityObserver;
 
+/// <summary>
+/// Render a live updatable progress of each activity step
+/// </summary>
 public sealed class LiveActivityRenderer : IDisposable
 {
     private readonly IAnsiConsole _console;
@@ -15,7 +18,7 @@ public sealed class LiveActivityRenderer : IDisposable
     private readonly Spinner _spinner = Spinner.Known.Default;
     private Timer? _timer;
     private event Action<object>? Refresh;
-    
+
     public LiveActivityRenderer(IAnsiConsole console, int? interval = 100)
     {
         if (interval != null)
@@ -56,7 +59,7 @@ public sealed class LiveActivityRenderer : IDisposable
                 }
                 catch (OperationCanceledException)
                 {
-                        
+
                     /* swallow */
                 }
                 finally
@@ -136,22 +139,22 @@ public sealed class LiveActivityRenderer : IDisposable
 
         return layout;
     }
-    
+
     public string Pad(string? text, int length)
     {
         var s = (text ?? string.Empty);
-        if (s.Length > length) 
-            s = s.Substring(0, length-2) + ..;
+        if (s.Length > length)
+            s = s.Substring(0, length - 2) + ..;
         s = s.PadRight(length, ' ');
         return s;
     }
-    
+
     private static IRenderable StatusIcon(bool started, bool finished, string spinner)
     {
-        var (icon, color) = !started ? ("○","grey") : !finished ? (spinner,"yellow") : ("✔","green");
+        var (icon, color) = !started ? ("○", "grey") : !finished ? (spinner, "yellow") : ("✔", "green");
         return new Markup($"[{color}]{icon}[/]");
     }
-   
+
     public void Dispose()
     {
         _unsubscribe?.Invoke();

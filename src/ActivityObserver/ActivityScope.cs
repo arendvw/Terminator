@@ -6,7 +6,6 @@ namespace Terminator.ActivityObserver;
 /// <summary>
 /// It's a place where you can show which activities will happen, and if they happened yet. You can pass logs, and it should somehow catch exceptions. 
 /// </summary>
-
 public class ActivityScope : IDisposable
 {
     public event Action<ActivityScope>? Started;

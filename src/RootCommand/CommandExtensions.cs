@@ -7,6 +7,9 @@ using Terminator.DependencyInjection;
 
 namespace Terminator.RootCommand;
 
+/// <summary>
+/// Extensions to get all existing commands
+/// </summary>
 public static class CommandExtensions
 {
     public static IEnumerable<CommandDescriptor> GetCommands(this Command command, CommandDescriptor? parent = null)
@@ -20,7 +23,7 @@ public static class CommandExtensions
                 command.Name
             ]
         };
-        
+
         if (command.IsExecutable && command.Name != "root-command")
         {
             yield return cmd;
@@ -33,7 +36,7 @@ public static class CommandExtensions
             }
         }
     }
-    
+
     public static async Task<int> RunCommandAsync<T>(this CommandExecutor<T> executor, CommandContext context, IAnsiConsole ansiConsole) where T : class
     {
         var commands = context.RootCommand!
@@ -43,11 +46,11 @@ public static class CommandExtensions
             .Title("Select a command:")
             .AddChoices(commands)
             .SearchPlaceholderText("Search...");
-        
+
         prompt.SearchEnabled = true;
         var choice = prompt.ShowWithCancel(ansiConsole);
 
         // Run the selected command with full parsing
-        return await executor.RunCommandAsync(string.Join(" ",choice.Command));
+        return await executor.RunCommandAsync(string.Join(" ", choice.Command));
     }
 }

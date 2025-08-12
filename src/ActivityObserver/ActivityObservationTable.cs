@@ -6,7 +6,9 @@ using System.Linq;
 namespace Terminator.ActivityObserver;
 
 /// <summary>
-/// Monitor a table of activities
+/// Monitor a table of activities, store the data and aggregate the events they generate to a central place
+/// So the data can be consumed by renderers
+/// 
 /// </summary>
 public class ActivityObservationTable : IDisposable
 {
