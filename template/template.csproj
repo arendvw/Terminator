@@ -7,4 +7,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\src\Terminator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoSpectre.SourceGeneration" Version="0.11.0" />
+    <PackageReference Include="Nuke.Common" Version="9.0.4" />
+  </ItemGroup>
+
 </Project>

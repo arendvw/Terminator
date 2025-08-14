@@ -6,6 +6,9 @@
         <RootNamespace>Terminator</RootNamespace>
         <Version>1.0.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Terminator</Title>
+        <Authors>Arend van Waart</Authors>
+        <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="CliWrap" Version="3.9.0" />

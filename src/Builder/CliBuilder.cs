@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using CommandDotNet;
 using CommandDotNet.Builders.ArgumentDefaults;
@@ -37,7 +38,7 @@ public static class CliBuilder
         CtrlCSupport.EnableCtrlC();
         return runner;
     }
-    
+
     /// <summary>
     /// Configure the CLI app
     /// 
@@ -52,10 +53,9 @@ public static class CliBuilder
         {
             runner = runner.UseDefaultsFromConfig(DefaultSources.GetValueFunc("Config", key => configuration[key]));
         }
+
         runner.Configure(b => b.UseMiddleware(RunRootCommandMiddleWare<T>(), MiddlewareStages.ParseInput));
-        runner
-            .UseSpectreAnsiConsole()
-            .UseSpectreArgumentPrompter().Configure(c =>
+        runner.UseSpectreAnsiConsole().Configure(c =>
         {
             var help = c.AppSettings.Help;
             help.UsageAppNameStyle = UsageAppNameStyle.Adaptive;
@@ -75,7 +75,11 @@ public static class CliBuilder
     {
         return async (ctx, next) =>
         {
-            if (ctx.ParseResult?.TargetCommand.Name != "root-command") return await next(ctx);
+            if (ctx.ParseResult!.TargetCommand.IsExecutable || ctx.ParseResult.ParseError != null ||
+                ctx.ParseResult.HelpWasRequested())
+            {
+                return await next(ctx);
+            }
 
             var exec = (CommandExecutor<T>)ctx.DependencyResolver!.Resolve(typeof(CommandExecutor<T>))!;
             var console = (IAnsiConsole)ctx.DependencyResolver!.Resolve(typeof(IAnsiConsole))!;
@@ -96,6 +100,8 @@ public static class CliBuilder
             services.AddTransient(type);
         }
 
+        services.AddTransient<T>();
+        services.AddTransient<CommandExecutor<T>>();
         services.AddSingleton((AppRunner<T>)runner);
         services.AddSingleton<IAnsiConsole>(e => AnsiConsole.Console);
         var cts = new CancellationTokenSource();
@@ -103,7 +109,6 @@ public static class CliBuilder
         {
             e.Cancel = true;
             cts.Cancel();
-            Console.WriteLine("Ctrl-C detected. Aborting..");
             Environment.Exit(0);
         };
         services.AddSingleton(cts);
