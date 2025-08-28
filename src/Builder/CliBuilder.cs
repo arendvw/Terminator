@@ -43,7 +43,7 @@ public static class CliBuilder
     /// Configure the CLI app
     /// 
     /// </summary>
-    /// <param name="runner">A Cli app runner</param>
+    /// <param name="configuration"></param>
     /// <typeparam name="T">RootCommand class with subcommands defined</typeparam>
     /// <returns></returns>
     public static AppRunner Configure<T>(IConfiguration? configuration = null) where T : class
