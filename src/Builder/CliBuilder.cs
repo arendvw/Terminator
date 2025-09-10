@@ -63,6 +63,7 @@ public static class CliBuilder
             help.PrintHelpOption = true;
             help.ExpandArgumentsInUsage = true;
         });
+        runner.UseCommandLogger();
         return runner;
     }
 

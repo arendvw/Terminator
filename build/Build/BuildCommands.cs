@@ -32,9 +32,10 @@ public class BuildCommands
         // Define all possible build steps
         var tokenStep = table.Announce("token", "Getting github token");
         var updateVersionStep = table.Announce("version", "Updating version information");
-        var buildApiStep = table.Announce("build", "Generate nuget package");
-        var nugetStep = table.Announce("nuget", "Push nuget");
-        
+        var buildApiStep = table.Announce("build", "Build library nuget package");
+        var buildTemplateStep = table.Announce("template", "Build template nuget package");
+        var nugetStep = table.Announce("nuget", "Push nuget packages");
+
         tracker.Show();
         try
         {
@@ -47,6 +48,7 @@ public class BuildCommands
             {
                 updateVersionStep.Start();
                 _state.NewVersion = VersionHelper.IncrementDotNetProjectVersion(BuildConfig.CoreProject);
+                VersionHelper.SetDotNetProjectVersion(BuildConfig.TemplateProject, _state.NewVersion);
                 updateVersionStep.Stop($"{_state.NewVersion}");
             }
 
@@ -59,22 +61,46 @@ public class BuildCommands
                 .WithWorkingDirectory(Environment.CurrentDirectory);
                 await buildApiStep.ExecuteAsync(serverBuild);
 
-                if (!File.Exists(BuildConfig.NugetPackage(_state.NewVersion)))
+                if (!File.Exists(BuildConfig.LibraryNugetPackage(_state.NewVersion)))
                 {
-                    throw new FileNotFoundException("NuGet package was not built", BuildConfig.NugetPackage(_state.NewVersion));
+                    throw new FileNotFoundException("NuGet library package was not built in " + BuildConfig.LibraryNugetPackage(_state.NewVersion));
                 }
                 buildApiStep.Stop();
             }
+            {
+                buildTemplateStep.Start();
+                var templateBuild = Cli.Wrap("dotnet")
+                .WithArguments([
+                    "build", BuildConfig.TemplateProject, "--configuration", BuildConfig.Configuration
+                ])
+                .WithWorkingDirectory(Environment.CurrentDirectory);
+                await buildTemplateStep.ExecuteAsync(templateBuild);
 
-                        {
+                if (!File.Exists(BuildConfig.TemplateNugetPackage(_state.NewVersion)))
+                {
+                    throw new FileNotFoundException("NuGet template package was not built in " + BuildConfig.TemplateNugetPackage(_state.NewVersion));
+                }
+                buildTemplateStep.Stop();
+            }
+            {
                 nugetStep.Start();
-                var nugetPackage = BuildConfig.NugetPackage(_state.NewVersion);
+                var nugetPackage = BuildConfig.LibraryNugetPackage(_state.NewVersion);
                 // Publish NuGet package
                 await NuGetHelper.PublishAsync(
                     BuildConfig.NuGetSource,
                     nugetPackage,
                     _state.GitHubToken
                 );
+
+                nugetStep.Report(0.5, "Pushed package");
+                var templatePackage = BuildConfig.TemplateNugetPackage(_state.NewVersion);
+                // Publish NuGet package
+                await NuGetHelper.PublishAsync(
+                    BuildConfig.NuGetSource,
+                    templatePackage,
+                    _state.GitHubToken
+                );
+
                 nugetStep.Stop();
             }
         }

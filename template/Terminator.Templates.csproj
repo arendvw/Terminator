@@ -1,26 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <PackageType>Template</PackageType>
-        <PackageVersion>1.0.0</PackageVersion>
-        <PackageId>Terminator.Templates</PackageId>
-        <Title>Terminator Templates</Title>
-        <Authors>StudioAvw</Authors>
-        <Description>Templates for the Terminator CLI tool.</Description>
-        <PackageTags>dotnet-new;templates;terminator</PackageTags>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-        <IncludeContentInPack>true</IncludeContentInPack>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <ContentTargetFolders>content</ContentTargetFolders>
-        <NoWarn>$(NoWarn);NU5128</NoWarn>
-        <NoDefaultExcludes>true</NoDefaultExcludes>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <Content Include="Builder\**\*" Exclude="Builder\**\bin\**;Builder\**\obj\**" />
-        <Content Include="Simple\**\*" Exclude="Simple\**\bin\**;Simple\**\obj\**" />
-        <Compile Remove="**\*" />
-    </ItemGroup>
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>Terminator.Templates</PackageId>
+    <Title>Terminator Templates</Title>
+    <Authors>StudioAvw</Authors>
+    <Description>Templates for the Terminator CLI tool.</Description>
+    <PackageTags>dotnet-new;templates;terminator</PackageTags>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.11</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Builder\**\*" Exclude="Builder\**\bin\**;Builder\**\obj\**" />
+    <Content Include="Simple\**\*" Exclude="Simple\**\bin\**;Simple\**\obj\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
 </Project>

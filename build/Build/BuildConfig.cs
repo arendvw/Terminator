@@ -5,8 +5,9 @@ public class BuildConfig
 {
     // Project paths
     public static readonly string CoreProject = Path.Combine("src", "Terminator.csproj");   
-    public static string NugetPackage(Version version) => Path.Combine("src", "bin", "Release", $"Terminator.{version.Major}.{version.Minor}.{version.Build}.nupkg");
-    public static string TemplatePackage(Version version) => Path.Combine("template", "bin", "Release", $"Terminator.Templates.{version.Major}.{version.Minor}.{version.Build}.nupkg");
+    public static readonly string TemplateProject = Path.Combine("template", "Terminator.Templates.csproj");
+    public static string LibraryNugetPackage(Version version) => Path.Combine("src", "bin", "Release", $"Terminator.{version.Major}.{version.Minor}.{version.Build}.nupkg");
+    public static string TemplateNugetPackage(Version version) => Path.Combine("template", "bin", "Release", $"Terminator.Templates.{version.Major}.{version.Minor}.{version.Build}.nupkg");
     // Build settings
     public static readonly string Configuration = "Release";
     // NuGet settings for GitHub Packages

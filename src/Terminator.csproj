@@ -3,12 +3,16 @@
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Terminator</RootNamespace>
-    <Version>1.0.5</Version>
+    <Version>1.0.11</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Terminator</Title>
     <Authors>Arend van Waart</Authors>
     <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.9.0" />
     <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
