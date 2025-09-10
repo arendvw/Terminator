@@ -21,7 +21,6 @@ public class BuildCommands
         var table = tracker.Table;
         using (var gitCheckStep = table.Start("git", "Checking git state"))
         {
-            CheckPrerequisites();
             if (!await GitHelper.CheckAndAskForStagedChanges(gitCheckStep, console))
             {
                 return;
@@ -35,6 +34,7 @@ public class BuildCommands
         var buildApiStep = table.Announce("build", "Build library nuget package");
         var buildTemplateStep = table.Announce("template", "Build template nuget package");
         var nugetStep = table.Announce("nuget", "Push nuget packages");
+        var gitStep = table.Announce("git", "Push changes to git");
 
         tracker.Show();
         try
@@ -44,7 +44,7 @@ public class BuildCommands
                 _state.GitHubToken = await GithubTokenHelper.GetTokenAsync(tokenStep);
                 tokenStep.Stop();
             }
-            
+
             {
                 updateVersionStep.Start();
                 _state.NewVersion = VersionHelper.IncrementDotNetProjectVersion(BuildConfig.CoreProject);
@@ -103,6 +103,19 @@ public class BuildCommands
 
                 nugetStep.Stop();
             }
+
+            {
+                gitStep.Start();
+                if (_state.IsPublish)
+                {
+                    await GitHelper.CommitAndTag(gitStep, [BuildConfig.CoreProject, BuildConfig.TemplateProject], _state.NewVersion);
+                    gitStep.Stop("Pushed to remote");
+                }
+                else
+                {
+                    gitStep.Stop("Skipped - not a release build");
+                }
+            }
         }
         catch (BufferedCommandExecutionException ex)
         {
@@ -121,13 +134,6 @@ public class BuildCommands
         }
         // write a table of results?
     }
-
-    private void CheckPrerequisites()
-    {
-        _state.HasTypeScriptTools = CommandHelper.CommandExists("tsc") && CommandHelper.CommandExists("npm");
-        _state.HasDockerCommand = CommandHelper.CommandExists("docker");
-    }
-
     private void GetBuildPrompt(IAnsiConsole console)
     {
         var choice = console.Prompt(
@@ -137,7 +143,5 @@ public class BuildCommands
 
         _state.IsPublish = choice != "Just Build Client";
         _state.IsPreRelease = choice == "Prerelease";
-        _state.BuildDocker = true;
-        _state.PublishDocker = false;
     }
 }
