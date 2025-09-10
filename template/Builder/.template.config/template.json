@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "StudioAVw",
+  "classifications": [ "Console", "CLI", "Tools", "Build" ],
+  "identity": "Terminator.Builder",
+  "name": "Terminator Build-Tool",
+  "shortName": "terminator-build",
+  "description": "A template for creating a build and release tool.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "BuildTools",
+  "preferNameDirectory": true,
+  "primaryOutputs": [
+    { "path": "template.csproj" }
+  ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages needed by this project.",
+      "manualInstructions": [ { "text": "Run 'dotnet restore'" } ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

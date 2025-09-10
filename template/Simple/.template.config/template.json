@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "StudioAVw",
+  "classifications": [ "Console", "CLI", "Tools" ],
+  "identity": "Terminator.Simple",
+  "name": "Terminator CLI app (simple)",
+  "shortName": "terminator-simple",
+  "description": "A minimal Terminator-based CLI app with a root command and a subcommand.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "template",
+  "preferNameDirectory": true,
+  "symbols": {
+    "WithSubcommand": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "true",
+      "displayName": "Include subcommand",
+      "description": "If true, a sample subcommand is included in the project."
+    }
+  },
+  "primaryOutputs": [
+    { "path": "template.csproj" }
+  ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages needed by this project.",
+      "manualInstructions": [ { "text": "Run 'dotnet restore'" } ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

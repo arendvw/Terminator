@@ -8,12 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Terminator.csproj" />
+    <PackageReference Include="Terminator" Version="1.0.*"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoSpectre.SourceGeneration" Version="0.11.0" />
-    <PackageReference Include="Nuke.Common" Version="9.0.4" />
   </ItemGroup>
 
 </Project>

@@ -1,21 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Terminator</RootNamespace>
-        <Version>1.0.1</Version>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>Terminator</Title>
-        <Authors>Arend van Waart</Authors>
-        <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="CliWrap" Version="3.9.0" />
-        <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
-        <PackageReference Include="CommandDotNet.NameCasing" Version="5.*" />
-        <PackageReference Include="CommandDotNet.Spectre" Version="4.*" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0"/>
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.5" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Terminator</RootNamespace>
+    <Version>1.0.5</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>Terminator</Title>
+    <Authors>Arend van Waart</Authors>
+    <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.9.0" />
+    <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
+    <PackageReference Include="CommandDotNet.NameCasing" Version="5.*" />
+    <PackageReference Include="CommandDotNet.Spectre" Version="4.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.5" />
+    <PackageReference Include="NuGet.Configuration" Version="6.14.0" />
+    <PackageReference Include="NuGet.Versioning" Version="6.14.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
+  </ItemGroup>
 </Project>
