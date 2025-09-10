@@ -14,6 +14,7 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.12</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Builder\**\*" Exclude="Builder\**\bin\**;Builder\**\obj\**" />

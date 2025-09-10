@@ -106,22 +106,9 @@ All commands include generated help, which you can access by passing the `-h` or
 This package comes with templates to get you started with a new Terminator-based CLI application.
 
 ### Installation
-
-To use the templates, you first need to install them from NuGet. If you haven't already, you'll need to add the GitHub package repository for `arendvw` as a source. You can do this with the following command:
-
-```bash
-dotnet nuget add source "https://nuget.pkg.github.com/arendvw/index.json" -n "github-arendvw"
-```
-
-Once the source is configured, you can install the templates:
-
 ```bash
 dotnet new install Terminator.Templates
 ```
-
-### Usage
-
-Once the templates are installed, you can create new projects using `dotnet new`.
 
 #### Simple CLI App
 
