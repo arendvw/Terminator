@@ -101,50 +101,6 @@ All commands include generated help, which you can access by passing the `-h` or
 ./run.sh sub -h
 ```
 
-## Command Completions
-
-`CommandDotNet` provides support for tab completions in your shell, which can significantly improve the user experience by autocompleting command and option names.
-
-To enable completions, you first need to generate a script for your shell and then configure your shell to use it.
-
-### Generating the Script
-
-You can generate the completion script by running the `complete` command, specifying your shell (`bash`, `zsh`, `fish`, or `pwsh`).
-
-```bash
-# For zsh
-./run.sh complete zsh > ~/.your-app-completions.zsh
-
-# For bash
-./run.sh complete bash > ~/.your-app-completions.bash
-
-# For fish
-./run.sh complete fish > ~/.config/fish/completions/your-app.fish
-
-# For PowerShell
-./run.ps1 complete pwsh | Out-File -FilePath $PROFILE -Append
-```
-
-### Enabling the Script
-
-After generating the script, you need to source it in your shell's profile.
-
-*   **For zsh:** Add the following line to your `~/.zshrc` file:
-    ```bash
-    source ~/.your-app-completions.zsh
-    ```
-
-*   **For bash:** Add the following line to your `~/.bashrc` or `~/.bash_profile`:
-    ```bash
-    source ~/.your-app-completions.bash
-    ```
-
-*   **For fish:** The script is automatically loaded because it's in the `completions` directory.
-
-*   **For PowerShell:** The previous command already appended the necessary line to your PowerShell profile.
-
-After updating your profile, restart your shell or source the profile (e.g., `source ~/.zshrc`) for the changes to take effect. You can then use the tab key to autocomplete your application's commands.
-
 ## Templates
 
 This package comes with templates to get you started with a new Terminator-based CLI application.

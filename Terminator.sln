@@ -1,8 +1,11 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminator", "src\Terminator.csproj", "{310885C2-C664-7B25-0C4F-780E134168A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "build", "build\build.csproj", "{A561CE33-248F-46AB-BDF2-9B55A8109812}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +17,10 @@ Global
 		{310885C2-C664-7B25-0C4F-780E134168A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{310885C2-C664-7B25-0C4F-780E134168A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{310885C2-C664-7B25-0C4F-780E134168A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A561CE33-248F-46AB-BDF2-9B55A8109812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A561CE33-248F-46AB-BDF2-9B55A8109812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A561CE33-248F-46AB-BDF2-9B55A8109812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A561CE33-248F-46AB-BDF2-9B55A8109812}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
