@@ -6,11 +6,12 @@
     <Version>1.0.12</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Terminator</Title>
-    <Authors>Arend van Waart</Authors>
+    <Authors>StudioAvw</Authors>
     <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/arendvw/Terminator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-
   </PropertyGroup>
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
