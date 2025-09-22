@@ -3,7 +3,7 @@
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Terminator</RootNamespace>
-    <Version>1.0.17</Version>
+    <Version>1.0.18</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Terminator</Title>
     <Authors>StudioAvw</Authors>
