@@ -17,7 +17,7 @@
     <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.19</Version>
+    <Version>1.0.20</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="\" />
