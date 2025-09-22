@@ -5,7 +5,7 @@
     <Title>Terminator Templates</Title>
     <Authors>StudioAvw</Authors>
     <Description>Templates for the Terminator CLI tool.</Description>
-    <PackageReadmeFile>../README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>dotnet-new;templates;terminator</PackageTags>
     <RepositoryUrl>https://github.com/arendvw/Terminator</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
