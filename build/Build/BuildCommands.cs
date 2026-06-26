@@ -1,7 +1,7 @@
-﻿using CliWrap;
 using CommandDotNet;
 using JetBrains.Annotations;
 using Spectre.Console;
+using Terminator;
 using Terminator.ActivityObserver;
 using Terminator.Helper;
 
@@ -10,138 +10,66 @@ namespace BuildTools.Build;
 [UsedImplicitly]
 public class BuildCommands
 {
-    private readonly BuildRuntimeState _state = new();
-
     [UsedImplicitly]
-    [Command( Description = "Build and release a new version")]
-    public async Task Release(IAnsiConsole console, bool silent = false)
+    [Command(Description = "Tag a new release. Pushing the tag triggers the publish workflow.")]
+    public async Task Release(IAnsiConsole console)
     {
-        // Create a tracker to show the steps
+        // Versions are derived from git tags by MinVer and packages are published by
+        // .github/workflows/publish.yml on tag push, so releasing is just creating a tag.
         await using var tracker = new CliTracker(console);
         var table = tracker.Table;
-        using (var gitCheckStep = table.Start("git", "Checking git state"))
+
+        // Interactive steps must run before the live UI starts.
+        Version version;
+        using (var gitCheck = table.Start("git", "Checking git state"))
         {
-            if (!await GitHelper.CheckAndAskForStagedChanges(gitCheckStep, console))
+            if (!await GitHelper.CheckAndAskForStagedChanges(gitCheck, console))
             {
                 return;
             }
-            GetBuildPrompt(console);
+
+            var latest = await GetLatestVersionTagAsync(gitCheck);
+            var suggested = latest is null
+                ? new Version(1, 0, 0)
+                : new Version(latest.Major, latest.Minor, latest.Build + 1);
+
+            var prompt = new TextPrompt<string>("Version to release:")
+                .DefaultValue(suggested.ToString(3))
+                .Validate(value => Version.TryParse(value, out _), "[red]Not a valid version[/]");
+            version = new Version(console.PromptWithCancel(prompt)!);
         }
 
-        // Define all possible build steps
-        var tokenStep = table.Announce("token", "Getting github token");
-        var updateVersionStep = table.Announce("version", "Updating version information");
-        var buildApiStep = table.Announce("build", "Build library nuget package");
-        var buildTemplateStep = table.Announce("template", "Build template nuget package");
-        var nugetStep = table.Announce("nuget", "Push nuget packages");
-        var gitStep = table.Announce("git", "Push changes to git");
-
+        var tag = version.ToString(3);
+        var tagStep = table.Announce("tag", $"Tagging release {tag}");
         tracker.Show();
+
         try
         {
-            {
-                tokenStep.Start();
-                _state.GitHubToken = await GithubTokenHelper.GetTokenAsync(tokenStep);
-                tokenStep.Stop();
-            }
-
-            {
-                updateVersionStep.Start();
-                _state.NewVersion = VersionHelper.IncrementDotNetProjectVersion(BuildConfig.CoreProject);
-                VersionHelper.SetDotNetProjectVersion(BuildConfig.TemplateProject, _state.NewVersion);
-                updateVersionStep.Stop($"{_state.NewVersion}");
-            }
-
-            {
-                buildApiStep.Start();
-                var serverBuild = Cli.Wrap("dotnet")
-                .WithArguments([
-                    "build", BuildConfig.CoreProject, "--configuration", BuildConfig.Configuration
-                ])
-                .WithWorkingDirectory(Environment.CurrentDirectory);
-                await buildApiStep.ExecuteAsync(serverBuild);
-
-                if (!File.Exists(BuildConfig.LibraryNugetPackage(_state.NewVersion)))
-                {
-                    throw new FileNotFoundException("NuGet library package was not built in " + BuildConfig.LibraryNugetPackage(_state.NewVersion));
-                }
-                buildApiStep.Stop();
-            }
-            {
-                buildTemplateStep.Start();
-                var templateBuild = Cli.Wrap("dotnet")
-                .WithArguments([
-                    "build", BuildConfig.TemplateProject, "--configuration", BuildConfig.Configuration
-                ])
-                .WithWorkingDirectory(Environment.CurrentDirectory);
-                await buildTemplateStep.ExecuteAsync(templateBuild);
-
-                if (!File.Exists(BuildConfig.TemplateNugetPackage(_state.NewVersion)))
-                {
-                    throw new FileNotFoundException("NuGet template package was not built in " + BuildConfig.TemplateNugetPackage(_state.NewVersion));
-                }
-                buildTemplateStep.Stop();
-            }
-            {
-                nugetStep.Start();
-                var nugetPackage = BuildConfig.LibraryNugetPackage(_state.NewVersion);
-                // Publish NuGet package
-                await NuGetHelper.PublishAsync(
-                    BuildConfig.NuGetSource,
-                    nugetPackage,
-                    _state.GitHubToken
-                );
-
-                nugetStep.Report(0.5, "Pushed package");
-                var templatePackage = BuildConfig.TemplateNugetPackage(_state.NewVersion);
-                // Publish NuGet package
-                await NuGetHelper.PublishAsync(
-                    BuildConfig.NuGetSource,
-                    templatePackage,
-                    _state.GitHubToken
-                );
-
-                nugetStep.Stop();
-            }
-
-            {
-                gitStep.Start();
-                if (_state.IsPublish)
-                {
-                    await GitHelper.CommitAndTag(gitStep, [BuildConfig.CoreProject, BuildConfig.TemplateProject], _state.NewVersion);
-                    gitStep.Stop("Pushed to remote");
-                }
-                else
-                {
-                    gitStep.Stop("Skipped - not a release build");
-                }
-            }
+            tagStep.Start();
+            await GitHelper.RunGit(tagStep, "tag", "-a", tag, "-m", $"[Release] release of {tag}");
+            await GitHelper.RunGit(tagStep, "push", "origin", tag);
+            tagStep.Stop($"Pushed tag {tag} - the publish workflow will release it");
         }
         catch (BufferedCommandExecutionException ex)
         {
             await tracker.Stop();
-            console.MarkupLine($"[bold red]Exception[/]");
-            console.MarkupLine($"[bold red]Command: {ex.Command.TargetFilePath} {ex.Command.Arguments}[/]");
-            console.MarkupLine($"[grey] {ex.StackTrace}[/]");
+            console.MarkupLine("[bold red]Release failed[/]");
+            console.MarkupLine($"[red]{ex.Command.TargetFilePath} {ex.Command.Arguments}[/]");
+            console.MarkupLine($"[grey]{ex.BufferedCommandResult.StandardError}[/]");
         }
-        catch (Exception ex)
-        {
-            await tracker.Stop();
-            console.MarkupLine($"[bold red]Exception[/]");
-            console.MarkupLine($"[bold red]{ex.Message}[/]");
-            console.MarkupLine($"[grey] {ex.StackTrace}[/]");
-
-        }
-        // write a table of results?
     }
-    private void GetBuildPrompt(IAnsiConsole console)
-    {
-        var choice = console.Prompt(
-            new SelectionPrompt<string>()
-                .Title("What kind of version do you wish to build?")
-                .AddChoices(["Just Build Client", "Prerelease", "Release"]));
 
-        _state.IsPublish = choice != "Just Build Client";
-        _state.IsPreRelease = choice == "Prerelease";
+    /// <summary>Returns the highest existing version tag, or null if there are none.</summary>
+    private static async Task<Version?> GetLatestVersionTagAsync(ActivityScope scope)
+    {
+        var result = await GitHelper.RunGit(scope, "tag", "--list", "--sort=-v:refname");
+        foreach (var line in result.StandardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (Version.TryParse(line.Trim(), out var version))
+            {
+                return version;
+            }
+        }
+        return null;
     }
 }
