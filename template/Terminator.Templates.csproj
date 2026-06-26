@@ -17,9 +17,10 @@
     <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.22</Version>
+    <!-- Version is derived from the git tag by MinVer (see PackageReference below). -->
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
     <Content Include="Builder\**\*" Exclude="Builder\**\bin\**;Builder\**\obj\**" />
     <Content Include="Simple\**\*" Exclude="Simple\**\bin\**;Simple\**\obj\**" />

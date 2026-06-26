@@ -9,7 +9,9 @@
 
     <ItemGroup>
         <PackageReference Include="CliWrap" Version="3.9.0" />
-        <PackageReference Include="Spectre.Console" Version="0.51.1" />
+        <!-- No explicit Spectre.Console version: align with the version Terminator is
+             built against (0.49.1, pinned transitively by CommandDotNet.Spectre 4.1.0).
+             Overriding it here caused two IAnsiConsole identities and CS0012. -->
         <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
         <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
