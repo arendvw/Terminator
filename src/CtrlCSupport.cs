@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandDotNet.Prompts;
@@ -16,14 +18,84 @@ public static class CtrlCSupport
 
     public static void EnableCtrlC()
     {
-        Console.TreatControlCAsInput = false;
+        // Only valid when a real console is attached; throws if stdin is redirected (headless).
+        if (!Console.IsInputRedirected)
+        {
+            try
+            {
+                Console.TreatControlCAsInput = false;
+            }
+            catch (Exception)
+            {
+                // No interactive console available - nothing to configure.
+            }
+        }
+
         Console.CancelKeyPress += (sender, e) =>
         {
-            e.Cancel = true; // Prevent the process from terminating
+            if (CancellationTokenSource.IsCancellationRequested)
+            {
+                // Second Ctrl+C: user insists. Flush buffered output (important when
+                // stdout is redirected/piped) and terminate with the conventional code.
+                FlushOutput();
+                return; // e.Cancel left false -> runtime terminates the process.
+            }
+
+            // First Ctrl+C: keep the process alive and cancel cooperatively so that
+            // finally/await-using cleanup runs and buffered output is flushed normally.
+            e.Cancel = true;
             CancellationTokenSource.Cancel();
-            Environment.Exit(0); // Exit the application gracefully
         };
+
+        // Ctrl+C (SIGINT) is covered above. Also react to termination signals sent by
+        // orchestrators (kill, docker stop, Kubernetes, systemd, CI cancellation) so a
+        // headless process shuts down cooperatively instead of being killed mid-write.
+        RegisterPosixSignal(PosixSignal.SIGTERM);
+        RegisterPosixSignal(PosixSignal.SIGQUIT);
     }
+
+    private static void RegisterPosixSignal(PosixSignal signal)
+    {
+        try
+        {
+            _signalRegistrations.Add(PosixSignalRegistration.Create(signal, context =>
+            {
+                // Cancel the default OS action (immediate termination) and shut down
+                // cooperatively so cleanup runs and buffered output is flushed.
+                context.Cancel = true;
+                if (!CancellationTokenSource.IsCancellationRequested)
+                {
+                    CancellationTokenSource.Cancel();
+                }
+                else
+                {
+                    // Already cancelling and signalled again: flush and exit promptly.
+                    FlushOutput();
+                    Environment.Exit(130);
+                }
+            }));
+        }
+        catch (Exception)
+        {
+            // Signal not supported on this platform - safe to ignore.
+        }
+    }
+
+    private static void FlushOutput()
+    {
+        try
+        {
+            Console.Out.Flush();
+            Console.Error.Flush();
+        }
+        catch (Exception)
+        {
+            // Best effort - nothing more we can do during shutdown.
+        }
+    }
+
+    // Hold registrations for the process lifetime so they are not garbage collected.
+    private static readonly List<PosixSignalRegistration> _signalRegistrations = new();
 
     public static Task<T> ShowWithCancelAsync<T>(this IPrompt<T> prompt, IAnsiConsole console)
     {

@@ -1,7 +1,9 @@
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
 using CliWrap.Buffered;
+using Terminator;
 using Terminator.ActivityObserver;
 
 namespace Terminator.Helper;
@@ -22,8 +24,15 @@ public static class CommandHelperExtensions
     /// <param name="pipeToStdOut">If false: the stdout of this command is not logged (e.g. for authentication requests of sensitive data)</param>
     /// <returns></returns>
     /// <exception cref="BufferedCommandExecutionException"></exception>
-    public static async Task<BufferedCommandResult> ExecuteAsync(this ActivityScope scope, Command command, bool pipeToStdOut = true)
+    public static async Task<BufferedCommandResult> ExecuteAsync(this ActivityScope scope, Command command, bool pipeToStdOut = true, CancellationToken cancellationToken = default)
     {
+        // Default to the global Ctrl+C / SIGTERM token so child processes are terminated
+        // on cancellation instead of running to completion.
+        if (cancellationToken == default)
+        {
+            cancellationToken = CtrlCSupport.CancellationTokenSource.Token;
+        }
+
         scope.Log(CliLogLevel.Information, GetCommandString(command));
         var stdOutBuf = new StringBuilder();
         var stdErrBuf = new StringBuilder();
@@ -40,7 +49,7 @@ public static class CommandHelperExtensions
                 PipeTarget.ToDelegate(s => scope.Log(CliLogLevel.StdErr, s)),
                 PipeTarget.ToStringBuilder(stdErrBuf)
             ));
-        var result = await cmd.ExecuteAsync();
+        var result = await cmd.ExecuteAsync(cancellationToken);
         var bufferedCommandResult = new BufferedCommandResult(result.ExitCode, result.StartTime, result.ExitTime, stdOutBuf.ToString(), stdErrBuf.ToString());
         if (result.ExitCode != 0)
         {

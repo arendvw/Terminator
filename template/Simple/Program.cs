@@ -5,7 +5,15 @@ using Terminator.Builder;
 using Terminator.DependencyInjection;
 
 var app = CliBuilder.Initialize<RootCommand>();
-await app.RunAsync(args);
+try
+{
+    return await app.RunAsync(args);
+}
+catch (OperationCanceledException)
+{
+    // Ctrl+C / SIGTERM cooperative cancellation: exit with the conventional code.
+    return 130;
+}
 
 public class RootCommand
 {
