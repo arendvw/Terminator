@@ -104,13 +104,9 @@ public static class CliBuilder
         services.AddTransient<CommandExecutor<T>>();
         services.AddSingleton((AppRunner<T>)runner);
         services.AddSingleton<IAnsiConsole>(e => AnsiConsole.Console);
-        var cts = new CancellationTokenSource();
-        Console.CancelKeyPress += (_, e) =>
-        {
-            e.Cancel = true;
-            cts.Cancel();
-            Environment.Exit(0);
-        };
-        services.AddSingleton(cts);
+        // Reuse the single cooperative CancellationTokenSource so the token injected into
+        // commands is the same one Ctrl+C cancels. Avoids a second hard-exit handler that
+        // tears the process down before buffered (headless) output is flushed.
+        services.AddSingleton(CtrlCSupport.CancellationTokenSource);
     }
 }
