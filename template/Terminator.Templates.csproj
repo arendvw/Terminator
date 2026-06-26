@@ -16,7 +16,6 @@
     <ContentTargetFolders>content</ContentTargetFolders>
     <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
     <NoDefaultExcludes>true</NoDefaultExcludes>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!-- Version is derived from the git tag by MinVer (see PackageReference below). -->
   </PropertyGroup>
   <ItemGroup>

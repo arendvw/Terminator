@@ -4,7 +4,6 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Terminator</RootNamespace>
     <!-- Version is derived from the git tag by MinVer (see PackageReference below). -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Terminator</Title>
     <Authors>StudioAvw</Authors>
     <Description>An opinionated cli console runner for running easily selectable projects based on Spectre Console and Commanddotnet</Description>
