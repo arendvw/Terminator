@@ -44,7 +44,8 @@ public static class NuGetHelper
             throw new InvalidOperationException($"Package source '{sourceNameOrUrl}' not found.");
 
         var repo = Repository.Factory.GetCoreV3(source.Source);
-        var update = await repo.GetResourceAsync<PackageUpdateResource>(cancellationToken);
+        var update = await repo.GetResourceAsync<PackageUpdateResource>(cancellationToken)
+            ?? throw new InvalidOperationException($"Package source '{source.Name}' does not support pushing packages.");
 
         // NuGet.Protocol's PackageUpdateResource.Push has no CancellationToken overload, so an
         // in-flight upload cannot be interrupted; the timeout below bounds it. Honor cancellation

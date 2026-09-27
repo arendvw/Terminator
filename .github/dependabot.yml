@@ -17,6 +17,10 @@ updates:
       # (mismatched versions caused CS0012 in the build tool).
       commanddotnet:
         patterns: ["CommandDotNet*"]
+      # NuGet client packages depend on each other at the same version; bumping one alone
+      # causes NU1605 downgrade errors.
+      nuget-client:
+        patterns: ["NuGet.*"]
       test-dependencies:
         patterns: ["xunit*", "Microsoft.NET.Test.Sdk", "Microsoft.Testing.*"]
       minor-and-patch:
