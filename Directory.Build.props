@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Every .NET release currently in support. Update when a release ships or leaves support
+         (see AGENTS.md); templates hard-code the latest one and CI checks they match. -->
+    <TerminatorTargetFrameworks>net8.0;net9.0;net10.0</TerminatorTargetFrameworks>
+    <TerminatorLatestTargetFramework>net10.0</TerminatorLatestTargetFramework>
+  </PropertyGroup>
+</Project>

@@ -27,6 +27,18 @@ jobs:
             9.0.x
             10.0.x
 
+      # Templates can't import Directory.Build.props, so they hard-code the latest framework.
+      - name: Check templates target the latest framework
+        run: |
+          set -euo pipefail
+          latest=$(dotnet msbuild Directory.Build.props -getProperty:TerminatorLatestTargetFramework)
+          stale=$(grep -rhoE '<TargetFramework>[^<]+</TargetFramework>' template/Simple template/Builder \
+            | grep -v "<TargetFramework>$latest</TargetFramework>" || true)
+          if [ -n "$stale" ]; then
+            echo "::error::Templates must target $latest (Directory.Build.props), found: $stale"
+            exit 1
+          fi
+
       - name: Build
         run: dotnet build Terminator.sln -c Release
 
