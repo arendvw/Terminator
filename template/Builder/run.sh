@@ -9,7 +9,7 @@ set -e
 PROJECT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 BUILD_PROJECT="$PROJECT_PATH/BuildTools.csproj"
-BUILD_OUTPUT="$PROJECT_PATH/bin/Debug/net9.0/BuildTools.dll"
+BUILD_OUTPUT="$PROJECT_PATH/bin/Debug/BuildTools.dll"
 
 # Ensure we're in the project directory
 pushd "$PROJECT_PATH" > /dev/null

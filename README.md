@@ -4,13 +4,17 @@ Terminator is a framework for building user-friendly command-line interfaces (CL
 
 It's designed for creating tools that are easy to use and maintain, especially those that act as a "runner" for other projects.
 
+Terminator targets every currently supported .NET release (.NET 8, 9 and 10). The templates target the latest stable release.
+
+For the full API walkthrough, see the **[guide](docs/guide.md)**.
+
 ## Minimal example
 
 When a `Terminator`-based app is run without arguments, it shows an interactive drop-down list of all available commands. This makes the tool's capabilities discoverable without needing to memorize commands.
 
-```dotnet new console
-dotnet add Terminator
-dotnet add CommandDotNet
+```bash
+dotnet new console
+dotnet add package Terminator
 ```
 
 This is enabled by a simple bootstrap process in your `Program.cs`:
@@ -75,6 +79,16 @@ public class RootCommand
 }
 ```
 
+## More features
+
+The [guide](docs/guide.md) covers each of these with examples:
+
+- **Live activity tracking**: `CliTracker`, `ActivityScope` and `ActivityObservationTable` render a live progress table for multi-step operations.
+- **Shell commands**: run CliWrap commands bound to an `ActivityScope`, with stdout and stderr logged automatically.
+- **Release helpers**: `GitHelper`, `VersionHelper`, `NuGetHelper`, `NpmPublishHelper` and `GithubTokenHelper` for build and release tools.
+- **Ctrl+C support**: prompts and a global cancellation token that respect Ctrl+C.
+- **Configuration**: fall back to `IConfiguration` values for command arguments.
+
 ## Running the Application
 
 The templates generate helper scripts to make running your application easy across different platforms.
@@ -129,3 +143,16 @@ To create a new build and release tool, run:
 ```bash
 dotnet new terminator-build -n YourBuildToolName
 ```
+
+## Development
+
+```bash
+dotnet build Terminator.sln
+dotnet test --solution Terminator.sln
+```
+
+Every pull request runs CI, which builds, tests, packs, and builds a project generated from each template. Dependabot opens weekly dependency update PRs. See [AGENTS.md](AGENTS.md) for the repository layout and conventions.
+
+## Security
+
+Please report vulnerabilities privately. See [SECURITY.md](SECURITY.md).

@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directories:
+      - /src
+      - /build
+      - /tests/Terminator.Tests
+      - /template/Simple
+      - /template/Builder
+    schedule:
+      interval: weekly
+    ignore:
+      # Templates deliberately float on Terminator 1.0.*; it is released from this repo.
+      - dependency-name: Terminator
+    groups:
+      # CommandDotNet packages pin Spectre.Console transitively and must move together
+      # (mismatched versions caused CS0012 in the build tool).
+      commanddotnet:
+        patterns: ["CommandDotNet*"]
+      test-dependencies:
+        patterns: ["xunit*", "Microsoft.NET.Test.Sdk", "Microsoft.Testing.*"]
+      minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: dotnet-sdk
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

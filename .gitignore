@@ -1,3 +1,7 @@
 .idea/*
 *.sln.DotSettings.user
 tmp/*
+# Build output
+**/bin/
+**/obj/
+artifacts/

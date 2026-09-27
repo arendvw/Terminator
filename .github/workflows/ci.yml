@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0   # MinVer needs full history + tags to derive the version
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      # Templates can't import Directory.Build.props, so they hard-code the latest framework.
+      - name: Check templates target the latest framework
+        run: |
+          set -euo pipefail
+          latest=$(dotnet msbuild Directory.Build.props -getProperty:TerminatorLatestTargetFramework)
+          stale=$(grep -rhoE '<TargetFramework>[^<]+</TargetFramework>' template/Simple template/Builder \
+            | grep -v "<TargetFramework>$latest</TargetFramework>" || true)
+          if [ -n "$stale" ]; then
+            echo "::error::Templates must target $latest (Directory.Build.props), found: $stale"
+            exit 1
+          fi
+
+      - name: Build
+        run: dotnet build Terminator.sln -c Release
+
+      - name: Test
+        run: dotnet test --solution Terminator.sln -c Release --no-build
+
+      - name: Pack
+        run: |
+          dotnet pack src/Terminator.csproj -c Release -o artifacts
+          dotnet pack template/Terminator.Templates.csproj -c Release -o artifacts
+
+      # Instantiate each template and build it against the Terminator package packed above,
+      # so dependency bumps that break template consumers fail the PR.
+      - name: Template smoke test
+        run: |
+          set -euo pipefail
+          pkg=$(ls artifacts/Terminator.[0-9]*.nupkg)
+          version=$(basename "$pkg" .nupkg)
+          version=${version#Terminator.}
+          dotnet new install artifacts/Terminator.Templates.*.nupkg
+          for template in terminator-simple terminator-build; do
+            dir="$RUNNER_TEMP/smoke-$template"
+            dotnet new "$template" -n SmokeApp -o "$dir"
+            dotnet new nugetconfig -o "$dir"
+            dotnet nuget add source "$PWD/artifacts" -n local --configfile "$dir/nuget.config"
+            dotnet add "$dir" package Terminator --version "$version"
+            dotnet build "$dir" -c Release
+          done
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: artifacts/*.nupkg

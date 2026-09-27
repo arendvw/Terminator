@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $Project_Path = $PSScriptRoot
 
 $Build_Project = Join-Path $Project_Path "BuildTools.csproj"
-$Build_Output = Join-Path $Project_Path "bin/Debug/net9.0/BuildTools.dll"
+$Build_Output = Join-Path $Project_Path "bin/Debug/BuildTools.dll"
 
 # Ensure we're in the project directory
 Push-Location $Project_Path
