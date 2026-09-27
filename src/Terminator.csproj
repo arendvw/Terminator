@@ -26,7 +26,7 @@
     <PackageReference Include="CommandDotNet.Spectre" Version="4.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.12" />
-    <PackageReference Include="NuGet.Configuration" Version="6.14.3" />
+    <PackageReference Include="NuGet.Configuration" Version="7.9.0" />
     <PackageReference Include="NuGet.Versioning" Version="7.9.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.3" />
   </ItemGroup>
