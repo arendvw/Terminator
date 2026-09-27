@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.9.0" />
     <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
     <PackageReference Include="CommandDotNet.NameCasing" Version="5.1.0" />
     <PackageReference Include="CommandDotNet.Spectre" Version="4.1.0" />
