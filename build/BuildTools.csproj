@@ -10,16 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CliWrap" Version="3.10.5" />
-        <!-- No explicit Spectre.Console version: align with the version Terminator is
-             built against (0.49.1, pinned transitively by CommandDotNet.Spectre 4.1.0).
-             Overriding it here caused two IAnsiConsole identities and CS0012. -->
+        <!-- CliWrap, CommandDotNet and Microsoft.Extensions.DependencyInjection come from the
+             Terminator project reference. Don't repeat them here: a second, older version
+             causes NU1605 whenever Dependabot bumps the library.
+             No explicit Spectre.Console either: it is pinned transitively by CommandDotNet.Spectre,
+             and overriding it caused two IAnsiConsole identities and CS0012. -->
         <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.20" />
-        <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
-        <PackageReference Include="CommandDotNet.NameCasing" Version="5.1.0" />
-        <PackageReference Include="CommandDotNet.Spectre" Version="4.1.0" />
-<!--        <PackageReference Include="Terminator" Version="1.0.*" />-->
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="../src/Terminator.csproj" />

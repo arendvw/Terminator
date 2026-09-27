@@ -17,6 +17,6 @@
     <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
     <PackageReference Include="CommandDotNet.NameCasing" Version="5.1.0" />
     <PackageReference Include="CommandDotNet.Spectre" Version="4.1.0" />
-    <PackageReference Include="Terminator" Version="1.0.*" />
+    <PackageReference Include="Terminator" Version="1.*" />
   </ItemGroup>
 </Project>
