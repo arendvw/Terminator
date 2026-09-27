@@ -11,7 +11,7 @@ namespace BuildTools;
 /// Reference all rootcommands here 
 /// </summary>
 [UsedImplicitly]
-public class RootCommand(CommandExecutor<RootCommand> executor, IAnsiConsole ansiConsole) 
+public class RootCommand 
 {
     [Subcommand(RenameAs = "build")]
     public BuildCommands? Build { get; set; }

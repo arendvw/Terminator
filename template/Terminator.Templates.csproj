@@ -14,7 +14,8 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>
-    <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
+    <!-- NU5110: run.ps1 ships as template content, not as an install script. -->
+    <NoWarn>$(NoWarn);NU5128;NU5111;NU5110</NoWarn>
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <!-- Version is derived from the git tag by MinVer (see PackageReference below). -->
   </PropertyGroup>
