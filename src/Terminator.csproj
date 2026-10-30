@@ -27,6 +27,8 @@
     <PackageReference Include="CommandDotNet.Spectre" Version="4.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.14" />
+    <!-- NuGet.Packaging pulls in a vulnerable 8.0.1 (GHSA-846f-f764-76mx); pin a patched version. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
     <PackageReference Include="NuGet.Configuration" Version="7.9.0" />
     <PackageReference Include="NuGet.Versioning" Version="7.9.0" />
     <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
