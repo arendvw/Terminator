@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Spectre.Console;
@@ -93,7 +96,7 @@ public sealed class LiveActivityRenderer : IDisposable
         return $"{_spinner.Frames[frame]}";
     }
 
-    private Layout Build(ActivityObservationTable table, int frameCount = 0)
+    private IRenderable Build(ActivityObservationTable table, int frameCount = 0)
     {
         var layout = new Layout("Root")
             .SplitColumns(
@@ -110,7 +113,7 @@ public sealed class LiveActivityRenderer : IDisposable
         var messages = table.LatestLogs
             .Take(20)
             .Reverse()
-            .Select(e => Markup.FromInterpolated($"{e.TimeUtc:hh:mm:ss}: {e.Message}"));
+            .Select(e => Markup.FromInterpolated($"{e.TimeUtc:hh:mm:ss}: {Sanitize(e.Message)}"));
 
         var logs = new Grid().AddColumn();
         foreach (var item in messages)
@@ -118,7 +121,8 @@ public sealed class LiveActivityRenderer : IDisposable
             logs.AddRow([item]);
         }
 
-        layout["Log"].Update(new Panel(logs).Expand());
+        var logPanel = new Panel(logs).Expand();
+        layout["Log"].Update(logPanel);
 
         foreach (var e in table.SnapshotOrderedByStartUtc())
         {
@@ -130,23 +134,82 @@ public sealed class LiveActivityRenderer : IDisposable
             t.AddRow(
                 StatusIcon(e?.StartedUtc != null, e?.EndedUtc != null, frame),
                 new Markup(e?.Description ?? ""),
-                new Markup(Pad(e?.LastProgressMessage, 50)),
+                new Markup(Markup.Escape(Pad(Sanitize(e?.LastProgressMessage), 50))),
                 new Markup(e?.EndedUtc == null ? progress : $"{duration:0.0}s")
             );
         }
 
-        layout["Status"].Update(new Panel(t).Expand());
+        var statusPanel = new Panel(t).Expand();
+        layout["Status"].Update(statusPanel);
 
-        return layout;
+        return new ContentHeightLayout(layout, statusPanel, logPanel);
+    }
+
+    /// <summary>
+    /// A Layout always fills the whole console height. In a live display that leaves no room for
+    /// anything written to the console meanwhile, so every write scrolls the screen and the display jumps.
+    /// Render the layout only as tall as its tallest column, leaving at least one free line.
+    /// </summary>
+    private sealed class ContentHeightLayout(Layout layout, params IRenderable[] columns) : IRenderable
+    {
+        public Measurement Measure(RenderOptions options, int maxWidth) => ((IRenderable)layout).Measure(options, maxWidth);
+
+        public IEnumerable<Segment> Render(RenderOptions options, int maxWidth)
+        {
+            var columnWidth = Math.Max(1, maxWidth / columns.Length);
+            var contentHeight = columns
+                .Select(c => Segment.SplitLines(c.Render(options, columnWidth)).Count)
+                .DefaultIfEmpty(1)
+                .Max();
+            var height = Math.Max(1, Math.Min(contentHeight, options.ConsoleSize.Height - 1));
+            return ((IRenderable)layout).Render(options with { Height = height }, maxWidth);
+        }
     }
 
     public string Pad(string? text, int length)
     {
         var s = (text ?? string.Empty);
         if (s.Length > length)
-            s = s.Substring(0, length - 2) + ..;
+            s = s.Substring(0, length - 1) + "…";
         s = s.PadRight(length, ' ');
         return s;
+    }
+
+    private static readonly Regex AnsiEscape = new(@"\x1B(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1B]*(?:\x07|\x1B\\)|[@-Z\\-_])", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Make text from external sources (process output, logs) safe to measure: Spectre measures cells
+    /// differently from the terminal for tabs, control characters and escape sequences, so a line can
+    /// render wider than the console, wrap, and scroll the whole live display.
+    /// </summary>
+    internal static string Sanitize(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        text = AnsiEscape.Replace(text, string.Empty);
+        var sb = new StringBuilder(text.Length);
+        var column = 0;
+        foreach (var c in text)
+        {
+            if (c == '\n')
+            {
+                sb.Append(c);
+                column = 0;
+            }
+            else if (c == '\t')
+            {
+                var spaces = 4 - column % 4;
+                sb.Append(' ', spaces);
+                column += spaces;
+            }
+            else if (!char.IsControl(c))
+            {
+                sb.Append(c);
+                column++;
+            }
+        }
+        return sb.ToString();
     }
 
     private static IRenderable StatusIcon(bool started, bool finished, string spinner)
