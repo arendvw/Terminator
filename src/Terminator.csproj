@@ -14,6 +14,9 @@
     <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Terminator.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
