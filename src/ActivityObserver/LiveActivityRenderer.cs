@@ -96,7 +96,7 @@ public sealed class LiveActivityRenderer : IDisposable
         return $"{_spinner.Frames[frame]}";
     }
 
-    private IRenderable Build(ActivityObservationTable table, int frameCount = 0)
+    internal IRenderable Build(ActivityObservationTable table, int frameCount = 0)
     {
         var layout = new Layout("Root")
             .SplitColumns(
@@ -134,7 +134,7 @@ public sealed class LiveActivityRenderer : IDisposable
             t.AddRow(
                 StatusIcon(e?.StartedUtc != null, e?.EndedUtc != null, frame),
                 new Markup(e?.Description ?? ""),
-                new Markup(Markup.Escape(Pad(Sanitize(e?.LastProgressMessage), 50))),
+                new SingleLine(Sanitize(e?.LastProgressMessage).Replace('\n', ' ')),
                 new Markup(e?.EndedUtc == null ? progress : $"{duration:0.0}s")
             );
         }
@@ -163,6 +163,28 @@ public sealed class LiveActivityRenderer : IDisposable
                 .Max();
             var height = Math.Max(1, Math.Min(contentHeight, options.ConsoleSize.Height - 1));
             return ((IRenderable)layout).Render(options with { Height = height }, maxWidth);
+        }
+    }
+
+    /// <summary>
+    /// Plain text that never wraps: it is cut off with an ellipsis at the width its table column gets,
+    /// so a long progress message cannot add rows and change the height of the display.
+    /// </summary>
+    private sealed class SingleLine(string text) : IRenderable
+    {
+        private readonly Segment _segment = new(text);
+
+        public Measurement Measure(RenderOptions options, int maxWidth) =>
+            new(Math.Min(1, _segment.CellCount()), Math.Min(_segment.CellCount(), maxWidth));
+
+        public IEnumerable<Segment> Render(RenderOptions options, int maxWidth)
+        {
+            if (_segment.CellCount() <= maxWidth)
+                return [_segment];
+            if (maxWidth <= 0)
+                return [];
+            var truncated = Segment.Truncate(_segment, maxWidth - 1);
+            return truncated == null ? [new Segment("…")] : [truncated, new Segment("…")];
         }
     }
 
