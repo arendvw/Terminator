@@ -451,7 +451,6 @@ cd MyBuildTool
 | Package | Purpose |
 |---------|---------|
 | CommandDotNet | Command parsing, help generation, argument binding |
-| CommandDotNet.Spectre | Spectre.Console integration for rich output |
 | CommandDotNet.NameCasing | Kebab-case command names |
 | CommandDotNet.IoC.MicrosoftDependencyInjection | DI integration |
 | Spectre.Console | Rich terminal UI (tables, prompts, markup) |

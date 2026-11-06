@@ -12,9 +12,7 @@
     <ItemGroup>
         <!-- CliWrap, CommandDotNet and Microsoft.Extensions.DependencyInjection come from the
              Terminator project reference. Don't repeat them here: a second, older version
-             causes NU1605 whenever Dependabot bumps the library.
-             No explicit Spectre.Console either: it is pinned transitively by CommandDotNet.Spectre,
-             and overriding it caused two IAnsiConsole identities and CS0012. -->
+             causes NU1605 whenever Dependabot bumps the library. The same goes for Spectre.Console. -->
         <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
     </ItemGroup>
     <ItemGroup>

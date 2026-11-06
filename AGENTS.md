@@ -42,8 +42,8 @@ template against the freshly packed library. Run those steps locally when changi
   the templates and their run scripts, and `dotnet-version` in the CI workflow.
 - **Versions come from git tags** (MinVer). Never add a `<Version>` to a project file. Releasing
   is pushing a tag; see [docs/internal-release.md](docs/internal-release.md).
-- **Spectre.Console** is pinned transitively by `CommandDotNet.Spectre`. Don't add an explicit
-  Spectre.Console reference in consumers of the library; two versions cause CS0012. Update the
-  CommandDotNet packages together.
+- **Spectre.Console** is referenced directly by the library. Don't add `CommandDotNet.Spectre`: it
+  is compiled against the unsigned Spectre.Console 0.49, while 0.50+ is strong-named, so mixing
+  them fails with CS0012. Terminator has its own bridge instead (`src/Builder/AnsiConsoleBridge.cs`).
 - Commands are exposed in kebab-case via `CommandDotNet.NameCasing`.
 - Keep the [guide](docs/guide.md) in sync when changing public APIs.

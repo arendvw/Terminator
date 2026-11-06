@@ -23,11 +23,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="CliWrap" Version="3.10.5" />
-<!--    <PackageReference Include="Spectre.Console" Version="0.49.1" />-->
-<!--     <PackageReference Update="Spectre.Console" Version="0.51.1" />-->
-      <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+    <PackageReference Include="CommandDotNet" Version="8.1.1" />
+    <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="7.1.0" />
     <PackageReference Include="CommandDotNet.NameCasing" Version="5.*" />
-    <PackageReference Include="CommandDotNet.Spectre" Version="4.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.14" />
     <!-- NuGet.Packaging pulls in a vulnerable 8.0.1 (GHSA-846f-f764-76mx); pin a patched version. -->

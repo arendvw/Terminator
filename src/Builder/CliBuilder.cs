@@ -7,7 +7,6 @@ using CommandDotNet.Execution;
 using CommandDotNet.Help;
 using CommandDotNet.IoC.MicrosoftDependencyInjection;
 using CommandDotNet.NameCasing;
-using CommandDotNet.Spectre;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -55,7 +54,7 @@ public static class CliBuilder
         }
 
         runner.Configure(b => b.UseMiddleware(RunRootCommandMiddleWare<T>(), MiddlewareStages.ParseInput));
-        runner.UseSpectreAnsiConsole().Configure(c =>
+        runner.UseAnsiConsole().Configure(c =>
         {
             var help = c.AppSettings.Help;
             help.UsageAppNameStyle = UsageAppNameStyle.Adaptive;
