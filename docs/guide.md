@@ -424,6 +424,25 @@ var runner = CliBuilder.Configure<RootCommand>(config);
 // Arguments can now fall back to configuration values
 ```
 
+### Testing a CLI App
+
+`Initialize` and `Configure` take an optional `IAnsiConsole`. Pass a `TestConsole` from
+`Spectre.Console.Testing` (same version as Spectre.Console) to capture output and simulate key presses:
+
+```csharp
+using Spectre.Console.Testing;
+using Terminator.Builder;
+
+var console = new TestConsole();
+var exitCode = CliBuilder.Initialize<RootCommand>(console).Run("build");
+Assert.Contains("Build completed", console.Output);
+
+// Without arguments the interactive command picker runs; drive it with keys.
+var interactive = new TestConsole().Interactive();
+interactive.Input.PushKey(ConsoleKey.Enter);
+CliBuilder.Initialize<RootCommand>(interactive).Run();
+```
+
 ## Templates
 
 Install templates:

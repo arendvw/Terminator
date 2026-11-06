@@ -1,5 +1,6 @@
 using CommandDotNet;
 using Spectre.Console;
+using Spectre.Console.Testing;
 using Terminator.Builder;
 
 namespace Terminator.Tests;
@@ -45,6 +46,28 @@ public class AnsiConsoleBridgeTests
 
         Assert.Equal(97, forwarding.WindowWidth);
         Assert.Equal(31, forwarding.WindowHeight);
+    }
+
+    [Fact]
+    public void OutputEncoding_IsTheAnsiConsoleEncoding()
+    {
+        var (console, _) = CreateConsole();
+        var forwarding = new AnsiConsoleBridge.AnsiConsoleForwardingConsole(console);
+
+        forwarding.OutputEncoding = System.Text.Encoding.Unicode;
+
+        Assert.Equal(System.Text.Encoding.Unicode, console.Profile.Encoding);
+        Assert.Equal(console.Profile.Encoding, forwarding.OutputEncoding);
+    }
+
+    [Fact]
+    public void ReadKey_ReadsFromTheAnsiConsoleInput()
+    {
+        var console = new TestConsole().Interactive();
+        console.Input.PushKey(ConsoleKey.Y);
+        var forwarding = new AnsiConsoleBridge.AnsiConsoleForwardingConsole(console);
+
+        Assert.Equal(ConsoleKey.Y, forwarding.ReadKey(intercept: true)?.Key);
     }
 
     private static (IAnsiConsole Console, StringWriter Output) CreateConsole()
