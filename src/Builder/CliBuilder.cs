@@ -7,7 +7,6 @@ using CommandDotNet.Execution;
 using CommandDotNet.Help;
 using CommandDotNet.IoC.MicrosoftDependencyInjection;
 using CommandDotNet.NameCasing;
-using CommandDotNet.Spectre;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -26,13 +25,20 @@ public static class CliBuilder
     /// <param name="runner">A Cli app runner</param>
     /// <typeparam name="T">RootCommand class with subcommands defined</typeparam>
     /// <returns></returns>
-    public static AppRunner Initialize<T>() where T : class
+    public static AppRunner Initialize<T>() where T : class => Initialize<T>(null);
+
+    /// <summary>
+    /// Initialize a basic new CLI app that writes to <paramref name="ansiConsole"/>, for example a test console.
+    /// </summary>
+    /// <param name="ansiConsole">The console to use; <see cref="AnsiConsole.Console"/> when null.</param>
+    /// <typeparam name="T">RootCommand class with subcommands defined</typeparam>
+    public static AppRunner Initialize<T>(IAnsiConsole? ansiConsole) where T : class
     {
         var services = new ServiceCollection();
         // add all types where to root command exists
         services.AutoRegisterServiceRegistrars(typeof(T).Assembly);
-        var runner = CliBuilder.Configure<T>();
-        services.RegisterCommandRunner<T>(runner);
+        var runner = CliBuilder.Configure<T>(null, ansiConsole);
+        services.RegisterCommandRunner<T>(runner, ansiConsole);
         var provider = services.BuildServiceProvider();
         runner = runner.UseMicrosoftDependencyInjection(provider);
         CtrlCSupport.EnableCtrlC();
@@ -46,7 +52,16 @@ public static class CliBuilder
     /// <param name="configuration"></param>
     /// <typeparam name="T">RootCommand class with subcommands defined</typeparam>
     /// <returns></returns>
-    public static AppRunner Configure<T>(IConfiguration? configuration = null) where T : class
+    public static AppRunner Configure<T>(IConfiguration? configuration = null) where T : class =>
+        Configure<T>(configuration, null);
+
+    /// <summary>
+    /// Configure the CLI app to write to <paramref name="ansiConsole"/>, for example a test console.
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="ansiConsole">The console to use; <see cref="AnsiConsole.Console"/> when null.</param>
+    /// <typeparam name="T">RootCommand class with subcommands defined</typeparam>
+    public static AppRunner Configure<T>(IConfiguration? configuration, IAnsiConsole? ansiConsole) where T : class
     {
         var runner = new AppRunner<T>().UseNameCasing(Case.KebabCase, true);
         if (configuration != null)
@@ -55,7 +70,7 @@ public static class CliBuilder
         }
 
         runner.Configure(b => b.UseMiddleware(RunRootCommandMiddleWare<T>(), MiddlewareStages.ParseInput));
-        runner.UseSpectreAnsiConsole().Configure(c =>
+        runner.UseAnsiConsole(ansiConsole).Configure(c =>
         {
             var help = c.AppSettings.Help;
             help.UsageAppNameStyle = UsageAppNameStyle.Adaptive;
@@ -93,7 +108,17 @@ public static class CliBuilder
     /// <typeparam name="T"></typeparam>
     /// <param name="services"></param>
     /// <param name="runner"></param>
-    public static void RegisterCommandRunner<T>(this IServiceCollection services, AppRunner runner) where T : class
+    public static void RegisterCommandRunner<T>(this IServiceCollection services, AppRunner runner) where T : class =>
+        services.RegisterCommandRunner<T>(runner, null);
+
+    /// <summary>
+    /// Service registration for the command runners, with <paramref name="ansiConsole"/> as the <see cref="IAnsiConsole"/>.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="runner"></param>
+    /// <param name="ansiConsole">The console to register; <see cref="AnsiConsole.Console"/> when null.</param>
+    /// <typeparam name="T"></typeparam>
+    public static void RegisterCommandRunner<T>(this IServiceCollection services, AppRunner runner, IAnsiConsole? ansiConsole) where T : class
     {
         foreach (var (type, _) in runner.GetCommandClassTypes())
         {
@@ -103,7 +128,7 @@ public static class CliBuilder
         services.AddTransient<T>();
         services.AddTransient<CommandExecutor<T>>();
         services.AddSingleton((AppRunner<T>)runner);
-        services.AddSingleton<IAnsiConsole>(e => AnsiConsole.Console);
+        services.AddSingleton<IAnsiConsole>(_ => ansiConsole ?? AnsiConsole.Console);
         // Reuse the single cooperative CancellationTokenSource so the token injected into
         // commands is the same one Ctrl+C cancels. Avoids a second hard-exit handler that
         // tears the process down before buffered (headless) output is flushed.
