@@ -155,6 +155,20 @@ public class BuildCommands
 }
 ```
 
+On an interactive terminal with ANSI support the live display takes the whole window (the
+alternate screen buffer): the step table gets the width it needs, the log pane the rest, long log
+lines wrap, and the display redraws when the window is resized. When the tracker stops, the normal
+screen comes back with the final state written to it once, and anything written to the console
+while the display ran is shown in the log pane and written to the normal screen as well. A second
+tracker in the same process starts on a clean screen. Redirected output (CI logs, files) and
+consoles without ANSI support get an inline display that is only as high as its content.
+
+To always use the inline display, turn full screen off:
+
+```csharp
+await using var tracker = new CliTracker(console) { FullScreen = false };
+```
+
 ### ActivityScope - Single Activity Tracking
 
 ```csharp
