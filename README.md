@@ -4,7 +4,7 @@ Terminator is a framework for building user-friendly command-line interfaces (CL
 
 It's designed for creating tools that are easy to use and maintain, especially those that act as a "runner" for other projects.
 
-Terminator targets every currently supported .NET release (.NET 8, 9 and 10). The templates target the latest stable release.
+Terminator targets every currently supported .NET release (.NET 8, 9, 10 and 11). The templates target the latest stable release.
 
 For the full API walkthrough, see the **[guide](docs/guide.md)**.
 
