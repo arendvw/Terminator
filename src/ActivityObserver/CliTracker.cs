@@ -14,8 +14,16 @@ public sealed class CliTracker(IAnsiConsole console) : IAsyncDisposable
     private readonly CancellationTokenSource _cts = new();
     private Task? _uiTask;
 
+    /// <summary>
+    /// Use the whole terminal window while the live display runs, when the console is an interactive
+    /// ANSI terminal; the final state is written to the normal screen when it stops. Defaults to
+    /// <c>true</c>. Redirected output and consoles without ANSI support always get the inline display.
+    /// </summary>
+    public bool FullScreen { get; init; } = true;
+
     public void Show()
     {
+        _live.FullScreen = FullScreen;
         _uiTask = _live.RunAsync(Table, _cts.Token);
     }
     
