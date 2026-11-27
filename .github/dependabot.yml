@@ -12,6 +12,14 @@ updates:
     ignore:
       # Templates deliberately float on Terminator 1.0.*; it is released from this repo.
       - dependency-name: Terminator
+      # src/Terminator.csproj picks these per target framework (10.x for net8-10, 11.x for net11),
+      # so a major bump is a deliberate, hand-made change that comes with a new target framework.
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Diagnostics.DiagnosticSource"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Security.Cryptography.Pkcs"
+        update-types: ["version-update:semver-major"]
     groups:
       # CommandDotNet packages pin Spectre.Console transitively and must move together
       # (mismatched versions caused CS0012 in the build tool).
