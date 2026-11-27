@@ -30,6 +30,21 @@ git push origin 1.0.23      # or: git push --follow-tags
 
 That's it. Nothing to edit, no keys to handle.
 
+### Release branches
+
+`main` is the development branch and carries the newest line (1.4+, which adds .NET 11).
+Older lines live on `release/<major>.<minor>` branches, cut from that line's first tag:
+
+| Branch | Line | Targets |
+|--------|------|---------|
+| `main` | 1.4+ | net8.0, net9.0, net10.0, net11.0 |
+| `release/1.3` | 1.3.x | net8.0, net9.0, net10.0 (.NET 10 SDK) |
+
+To patch an older line, commit or cherry-pick the fix onto its branch, wait for CI, then tag
+there (`git tag 1.3.1 && git push origin 1.3.1`). The publish workflow runs from the tagged
+commit, so it uses that branch's SDK and workflow. Release branches take fixes only, and
+Dependabot does not watch them: update dependencies there by hand when a fix needs it.
+
 ### Choosing the version number
 
 `MAJOR.MINOR.PATCH`:
